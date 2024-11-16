@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "countdown.api.apps",
+    "countdown.apps.CountdownConfig",
+    "user.apps.UserConfig",
 ]
 
 MIDDLEWARE = [
