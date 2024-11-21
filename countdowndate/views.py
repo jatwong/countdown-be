@@ -16,6 +16,32 @@ def list_countdowns(request: HttpRequest) -> JsonResponse:
     # TODO: find user via token
     # user = get_user()
 
+    if not user:
+        return JsonResponse({"message": "401 Unauthorized"}, status=401)
+
+    # get user's db user_id
+    # user_id = user.user_id
+
+    # get all the user's countdowns
+    try:
+        countdowns = CountdownDate.objects.filter(user_id=user_id).values(
+            "title",
+            "date",
+        )
+
+        # converst QuerySet object to list for frontend
+        countdowns_list = list(countdowns)
+
+        return JsonResponse(
+            {"countdowns": countdowns_list},
+            status=200,
+        )
+    except DatabaseError as e:  # database error
+        return JsonResponse(
+            {"message": "Internal server error", "error": str(e)},
+            status=500,
+        )
+
 
 @require_http_methods(["POST"])
 def create_countdown(request: HttpRequest) -> JsonResponse:
