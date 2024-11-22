@@ -3,7 +3,7 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 import json
 
-from psycopg import DatabaseError
+from django.db import DatabaseError
 
 from countdowndate.models import CountdownDate
 import user
@@ -11,6 +11,20 @@ import user
 
 @require_http_methods(["GET"])
 def list_countdowns(request: HttpRequest) -> JsonResponse:
+    """
+    list_countdowns handles GET requests to list all countdowns for a specific user.
+    Retrieves user cookie to identify user and get user_id from the database.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing user cookies.
+
+    Returns JsonResponse:
+            200 (success) and list of user's countdowns and status
+        or errors:
+            401 (unauthorized user)
+            400 (missing content/fields)
+            500 (database error) and db error message
+    """
     user_token = request.COOKIES.get("jwt")  # TODO: get the user's jwt token
 
     # TODO: find user via token
@@ -45,6 +59,22 @@ def list_countdowns(request: HttpRequest) -> JsonResponse:
 
 @require_http_methods(["POST"])
 def create_countdown(request: HttpRequest) -> JsonResponse:
+    """
+    create_countdown handles POST requests to create a new countdown for a user.
+    Retrieves user cookie to identify user and get user_id from the database.
+    Includes user_id when creating new countdown.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing user cookies.
+            body: includes title and date of countdown
+
+    Returns JsonResponse:
+            201 (success) with new countdown id and status
+        or errors:
+            401 (unauthorized user)
+            400 (missing content/fields)
+            500 (database error) and db error message
+    """
     data = json.loads(request.body)
     user_token = request.COOKIES.get("jwt")  # TODO: get the user's jwt token
     title = data.get("title")
@@ -88,6 +118,23 @@ def create_countdown(request: HttpRequest) -> JsonResponse:
 
 @require_http_methods(["[POST]"])
 def edit_countdown(request: HttpRequest, id: int) -> JsonResponse:
+    """
+    edit_countdown handles POST requests to edit a countdown with a given id for a user.
+    Retrieves user cookie to identify user and get user_id from the database.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing user cookies.
+            body: includes title and date of countdown
+        id (int): The id of the countdown to be edited
+
+    Returns JsonResponse:
+            200 (success) with updated countdown and status
+        or errors:
+            401 (unauthorized user)
+            400 (missing content/fields)
+            404 (countdown not found)
+            500 (database error) and db error message
+    """
     data = json.loads(request.body)
     user_token = request.COOKIES.get("jwt")  # TODO: get the user's jwt token
     title = data.get("title")
@@ -143,6 +190,21 @@ def edit_countdown(request: HttpRequest, id: int) -> JsonResponse:
 
 @require_http_methods(["DELETE"])  # TODO: update FE to use delete method?
 def delete_countdown(request: HttpRequest, id: int) -> JsonResponse:
+    """
+    delete_countdown handles DELETE requests to delete a countdown with a given id for a user.
+    Retrieves user cookie to identify user and get user_id from the database.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing user cookies.
+        id (int): The id of the countdown to be deleted
+
+    Returns JsonResponse:
+            200 (success) with status
+        or errors:
+            401 (unauthorized user)
+            404 (countdown not found)
+            500 (database error) and db error message
+    """
     user_token = request.COOKIES.get("jwt")  # TODO: get the user's jwt token
 
     # TODO: find user via token
