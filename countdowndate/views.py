@@ -39,6 +39,7 @@ def list_countdowns(request: HttpRequest) -> JsonResponse:
     # get all the user's countdowns
     try:
         countdowns = CountdownDate.objects.filter(user_id=user_id).values(
+            "id",
             "title",
             "date",
         )
